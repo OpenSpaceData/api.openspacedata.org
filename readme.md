@@ -36,7 +36,7 @@ Start the server:\
 #### Send a request
 
 ```http
-  http://0.0.0.0:8000/v1/{use_case}/?from={date_from}&to={date_to}&location={location}
+  http://127.0.0.1:8000/v1/{use_case}/?from={date_from}&to={date_to}&location={location}
 ```
 
 or
