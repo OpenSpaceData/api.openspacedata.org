@@ -5,4 +5,4 @@ django-sortedm2m>=3.0.0,<3.1.0
 python-decouple==3.4
 sat-search==0.3.0
 gunicorn
-django-heroku
+pandas

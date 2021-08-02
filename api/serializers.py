@@ -3,6 +3,7 @@ from . import views
 from api.models import Application, Indice, Satellite, Band
 from satsearch import Search
 import requests
+import pandas as pd
 
 class IndiceSerializer(serializers.ModelSerializer):
 
@@ -55,17 +56,15 @@ class OsdSerializer(serializers.ModelSerializer):
         bbox_search = Search(
             bbox=self.context['location'],
             datetime=startDate+"/"+endDate,
-            query={'eo:cloud_cover': {'lt': 50}},
+            query={'eo:cloud_cover': {'lt': 50}, 'sentinel:data_coverage': {'gt': 80}},
             collections=[collection],
             url=url,
-            sort={'field': 'eo:cloud_cover', 'direction': 'desc'},
+            sortby = '+properties.eo:cloud_cover', 
         )
 
         items = bbox_search.items()
 
         downloads = {}
-
-        limit = 0
 
         for i, item in enumerate(items):
 
@@ -75,16 +74,23 @@ class OsdSerializer(serializers.ModelSerializer):
             data['Preview']= item.asset("thumbnail")["href"]
             data['Date']= item.properties["datetime"]
             data['Cloud cover']= item.properties["eo:cloud_cover"]
+            data['Latitude band']= item.properties["sentinel:latitude_band"]
+            data['Grid']= item.properties["sentinel:grid_square"]
+            data['UTM Zone']= item.properties["sentinel:utm_zone"]
+            data['Sequence']= item.properties["sentinel:sequence"]
+            data['Projection']= item.properties["proj:epsg"]
+            data['Data coverage']= item.properties["sentinel:data_coverage"]
 
             for band in bands.split(','):
                 data[band] = item.asset(band)["href"]
 
             downloads[i] = data
 
-            if i == limit:
-                break
-
-        return downloads
+        df=pd.DataFrame.from_dict(downloads, orient='index')
+        df=df.drop_duplicates('Grid')
+        results = df.to_dict(orient='index')
+        
+        return results
 
     class Meta:
         model = Application
