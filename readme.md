@@ -19,10 +19,16 @@ Go to the project directory:
   cd api.openspacedata.org
 ```
 
-Start the server with [Docker Compose](https://github.com/docker/compose):\
+Install requirements:
 
 ```bash
-  docker-compose up
+  pip install -r requirements.txt
+```
+
+Start the server:\
+
+```bash
+  python3 manage.py runserver
 ```
 *Note: You have to install Docker and Docker Compose first.*
 ## API Reference
